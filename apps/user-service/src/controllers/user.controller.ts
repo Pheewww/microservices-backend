@@ -1,6 +1,5 @@
 import { Request, Response} from "express";
-
-import {createUser, authenticateUser} from '../services/user.services';
+import {createUser, authenticateUser} from "../services/user.services";
 import { producer } from '@repo/shared/kafka';
 
 

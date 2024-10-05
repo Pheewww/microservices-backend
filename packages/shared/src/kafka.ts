@@ -1,4 +1,4 @@
-import {Kafka} from 'kafkajs';
+import { Kafka } from 'kafkajs';
 
 const kafka1 = new Kafka({
     clientId: 'pratilipi-backend',

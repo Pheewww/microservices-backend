@@ -1,8 +1,10 @@
 import express from "express";
 import userRoutes from "./routes/user.routes";
-import runKafkaConsumer  from './kafka'
+import runKafkaConsumer  from './kafka/index';
+import { connectUserDB } from './db';
 
 const app  =  express();
+connectUserDB();
 
 app.use(express.json());
 

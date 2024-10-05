@@ -5,7 +5,8 @@
   "exports":{
     "./auth": "./src/middlewares/auth.middleware.ts",
     "./error":"./src/middlewares/error.middleware.ts",
-    "./kafka": "./src/kafka.ts"
+    "./kafka": "./src/kafka.ts",
+    "./db": "./src/db.ts"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

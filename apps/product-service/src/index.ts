@@ -1,8 +1,11 @@
 import express from 'express';
 import productRoutes from './routes/product.routes'
-import runKafkaConsumer from './kafka';
+import runKafkaConsumer from './kafka/index';
+import { connectUserDB } from './db';
 
 const app = express();
+connectUserDB();
+
 app.use(express.json());
 
 app.use('/api/v1/products', productRoutes);

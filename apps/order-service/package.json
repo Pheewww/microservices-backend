@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -b",
-    "dev": "tsc -b && node dist/index.js"
+    "build": "esbuild src/index.ts --platform=node --bundle --outdir=dist",
+    "dev": "npm run build && nodemon dist/index.js"
   },
   "keywords": [],
   "author": "",

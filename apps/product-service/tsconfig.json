@@ -4,8 +4,8 @@
     "lib": ["ES2015"],
     "module": "NodeNext",
     "outDir": "./dist",
-    "rootDir": "./src", 
+    "rootDir": "./src",
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["src"]
+  "include": ["src/**/*"]
 }

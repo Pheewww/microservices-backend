@@ -1,9 +1,10 @@
 import express from 'express';
-import orderRoutes from './routes/order.routes';
-import runKafkaConsumer from './kafka';
-
+import orderRoutes from './routes/order.routes.js';
+import runKafkaConsumer from './kafka/index.js';
+import { connectUserDB } from './db.js';
 
 const app = express();
+connectUserDB();
 
 app.use(express.json());
 
@@ -12,6 +13,6 @@ app.use('/api/v1/orders', orderRoutes);
 
 const PORT = 3003;
 
-app.listen(PORT, "Order Service is running on ${PORT}");
+app.listen(PORT, () => console.log(`Order Service is running on ${PORT}`));
 
 runKafkaConsumer().catch(console.error);

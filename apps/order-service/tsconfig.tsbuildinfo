@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/models/order.model.ts","./src/routes/order.routes.ts"],"errors":true,"version":"5.6.2"}
+{"root":["./src/db.ts","./src/index.ts","./src/controllers/order.controller.ts","./src/kafka/index.ts","./src/models/order.model.ts","./src/routes/order.routes.ts","./src/services/order.services.ts"],"version":"5.6.2"}

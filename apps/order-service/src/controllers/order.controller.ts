@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createOrder } from '../services/order.services';
+import { createOrder } from '../services/order.services.js';
 import { producer } from '@repo/shared/kafka';
 
 export const placeOrder = async (req: Request, res: Response) => {

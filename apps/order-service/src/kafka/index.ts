@@ -13,6 +13,9 @@ const runKafkaConsumer = async () => {
             if (event.event === 'Product Created') {
                  
             }
+            if (event.event === 'User Registered') {
+                 
+            }
         },
     });
 };

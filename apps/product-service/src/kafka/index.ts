@@ -1,5 +1,6 @@
 
 import { producer, consumer } from '@repo/shared/kafka'; 
+import {Message}  from 'kafkajs';
 
 const runKafkaConsumer = async () => {
     await producer.connect();
@@ -8,9 +9,9 @@ const runKafkaConsumer = async () => {
     await consumer.subscribe({ topic: 'user-events', fromBeginning: true });
 
     consumer.run({
-    eachMessage: async ({ topic, partition, message: any}) => {
-      const event = JSON.parse(message.value.toString());
-      if (event.event === 'User Registered') {
+    eachMessage: async ({ topic, partition, message }: { topic: string; partition: number; message: Message }) => {
+      const event = JSON.parse(message.value?.toString() || '');
+      if (event.event === 'Order Placed') {
         
       }
     },
