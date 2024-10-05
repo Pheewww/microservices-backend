@@ -1,0 +1,17 @@
+{
+  "name": "@repo/shared",
+  "version": "1.0.0",
+  "main": "index.js",
+  "exports":{
+    "./auth": "./src/middlewares/auth.middleware.ts",
+    "./error":"./src/middlewares/error.middleware.ts",
+    "./kafka": "./src/kafka.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
