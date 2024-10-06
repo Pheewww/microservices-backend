@@ -5,27 +5,48 @@ import {InventoryUpdate, Product, User} from '@repo/shared/types'
 
 export const createOrder = async (data:any) => {
     try {
-        const orderId = data.id;
-        const orderExists  =  await Order.findOne({_id: orderId});
+        const orderId = data.orderId;
+        const orderExists  =  await Order.findOne({orderId});
 
         if (orderExists) {
             console.log("Order already exists");
-            return;
+             throw new Error ("Order already exists");
         }
 
-        // check if enough order quantitty exists before succesful order
+        const userExists = await localUser.findOne({email: data.userId})
+        if (!userExists) {
+             console.log("User not exist");
+             throw new Error ("User Doesnt Exist");
+        }
+
+        const productExists = await localProduct.findOne({productId: data.productId});
+
+        if(!productExists){
+            console.log("Product to order doesnt exist");
+            throw new Error ("Product doesnt exists");
+
+        }
+
+        const stockAvailaible = productExists.stock;
+        const reqQuantity = data.quantity;
+
+        // order only if enough q avaible
+        if (reqQuantity > stockAvailaible) {
+            throw new Error("not enough quantitty");
+        }
 
         const newOrder  = new Order({
-            id: orderId,
-            user: data.userId,
-            product: data.productId,
+            orderId,
+            userId: data.userId,
+            productId: data.productId,
             quantity: data.quantity
         });
         await newOrder.save();
         console.log('New Order Created:', newOrder);
         return newOrder;
-    } catch (error) {
-        console.error('Error handling Creating Order in Order Service:', error);        
+    } catch (error: any) {
+        console.error('Error handling Creating Order in Order Service:', error); 
+        throw new Error(error.message);      
     }
     
 }
@@ -33,10 +54,10 @@ export const createOrder = async (data:any) => {
 
 export const handleProductCreatedEvent = async (data: Product) => {
     try {
-        const productId = data.id;
+        const productId = data.productId;
 
         // check in own local
-        const productExists = await localProduct.findOne({ _id: productId });
+        const productExists = await localProduct.findOne({ productId });
         if (productExists) {
             console.log('Product already exists in the catalog.');
             return;
@@ -44,7 +65,7 @@ export const handleProductCreatedEvent = async (data: Product) => {
 
         // not in local, add
         const newProduct = new localProduct({
-            _id: productId,
+            productId,
             name: data.name,
             price: data.price,
             stock: data.stock
@@ -53,13 +74,18 @@ export const handleProductCreatedEvent = async (data: Product) => {
         await newProduct.save();
         console.log('New product added to local catalog of Order:', newProduct);
         return newProduct;
-    } catch (error) {
-        console.error('Error handling Product Created event in Order Service:', error);
+    } catch (error:any) {
+        console.error('Error', error);
+        throw new Error(error.message);
     }
 };
 
 export const handleInventoryUpdateEvent = async (data: InventoryUpdate[]) => {
     try {
+         if (!Array.isArray(data)) {
+            throw new Error("Invalid update data format; expected an array.");
+        }
+
         for(const update of data){
             const {id, stock} = update;
 
@@ -68,8 +94,14 @@ export const handleInventoryUpdateEvent = async (data: InventoryUpdate[]) => {
             }
 
             const product = await localProduct.findById(id);
-            if (!product) {
-                throw new Error (`Product Does not exist for ${id} id`);
+            // if (!product) {
+            //     console.error(`non-existent product ID: ${id}`);
+            //     throw new Error(`Product does not exist for ID ${id}`);
+            // }
+
+             if (!product) {
+                console.warn(`Product not found: ${id}. Skipping update.`);
+                continue; // Skip  
             }
             
             if(typeof stock === 'number'){

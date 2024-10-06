@@ -1,14 +1,16 @@
 import { producer, createConsumer } from '@repo/shared/kafka'; 
 import { handleInventoryUpdateEvent, handleProductCreatedEvent, handleUserRegisteredEvent, handleUserUpdateEvent } from '../services/order.services';
 
-const orderConsumer = createConsumer('order-service-group');
+const orderConsumer = createConsumer('ordergroup');
 const runKafkaConsumer = async () => {
+    try {
     await producer.connect();
     await orderConsumer.connect();
 
-  await orderConsumer.subscribe({ topics: ['product-service-events', 'user-events'], fromBeginning: true });
+  await orderConsumer.subscribe({ topics: ['productevents', 'userevents'], fromBeginning: true });
   
-  orderConsumer.run({
+  await orderConsumer.run({
+    
         eachMessage: async ({topic, partition, message }) => {
 
             if(!message.value){
@@ -75,7 +77,12 @@ const runKafkaConsumer = async () => {
             }
         },
     });
-};
+  } catch (error) {
+    console.error('Error in Kafka consumer:', error);
+    // Implement retry logic or graceful shutdown
+  }
+}
+
 
 export default runKafkaConsumer;
  

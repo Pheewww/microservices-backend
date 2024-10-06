@@ -14,10 +14,10 @@ export const addProduct = async (data:any) => {
     
 }
 
-export const listProduct = async (productId: string) => {
+export const listProduct = async (productId: number) => {
     
     try {
-        const product  = await Product.findById(productId);
+        const product  = await Product.findOne({productId});
         return product;
     } catch (error:any) {
         throw new Error(error.message);
@@ -43,7 +43,8 @@ export const inventoryUpdate = async (data: InventoryUpdate[]) => {
                 throw new Error ("Product ID is required for each update")
             }
 
-            const product = await Product.findById(id);
+            const productId = id;
+            const product = await Product.findOne({productId});
             if (!product) {
                 throw new Error (`Product Does not exist for ${id} id`);
             }
@@ -52,16 +53,18 @@ export const inventoryUpdate = async (data: InventoryUpdate[]) => {
 
                 const newStock = product.stock + stock;
                 if (newStock < 0) {
-                    throw new Error(`Error: Updating stock for product ID ${id} would result in negative quantity.`);
+                    throw new Error(`Error: Updating stock for product ID ${id}, would result in negative quantity. Other products have been updated`);
                 }
                 product.stock = newStock;
             }
+            console.log("updated product", product);
 
             await product.save();
         }
 
         return { message: 'Inventory updated successfully.' };
     } catch (error:any) {
+        console.log("error in inventory block");
         throw new Error(error.message);
     }
 

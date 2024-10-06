@@ -10,7 +10,7 @@ export const placeOrder = async (req: Request, res: Response) => {
      
     const order = await createOrder(req.body);
     if (!order) {
-      return;
+      return res.status(400).json({ error: "order already exist" });
     }
     
     // Emit Order Placed event to Kafka
@@ -21,12 +21,14 @@ export const placeOrder = async (req: Request, res: Response) => {
       productId: order.productId 
     }
 
-    await producer.send({
-      topic: 'order-service-events',
-      messages: [
-        { value: JSON.stringify({ event: 'Order Placed', orderPlacedEventData }) },
-      ],
-    });
+    console.log("kafka data -> orderPlacedEventData", orderPlacedEventData);
+
+    // await producer.send({
+    //   topic: 'orderevents',
+    //   messages: [
+    //     { value: JSON.stringify({ event: 'Order Placed', orderPlacedEventData }) },
+    //   ],
+    // });
 
     res.status(201).json(order);
   } catch (err: any) {

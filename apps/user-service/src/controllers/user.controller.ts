@@ -13,19 +13,23 @@ export const registerUser = async (req: Request, res: Response) => {
       return;
     }
 
+    console.log("new user created", user);
+
     const userData = {
       id: user.id,
       name: user.name,
       email: user.email,
     }
+
+    console.log("data to kafka -> userData", userData);
     
     // event to Kafka
-    await producer.send({
-      topic: 'user-events',
-      messages: [
-        { value: JSON.stringify({ event: 'User Registered', userData }) },
-      ],
-    });
+    // await producer.send({
+    //   topic: 'userevents',
+    //   messages: [
+    //     { value: JSON.stringify({ event: 'User Registered', userData }) },
+    //   ],
+    // });
 
     res.status(201).json(user);
   } catch (err: any) {
@@ -50,15 +54,18 @@ export const updateUserProfile  = async (req: Request, res: Response) => {
       email: update.email,
     }
 
+    console.log("data to kafka -> updatedData", updatedData);
+
+
     //only if name has changed
-    if (data.name) {
-    await producer.send({
-      topic: 'user-events',
-      messages: [{
-        value: JSON.stringify({event: 'User Profile Updated', updatedData})
-      }]
-    })
-      }
+    // if (data.name) {
+    // await producer.send({
+    //   topic: 'userevents',
+    //   messages: [{
+    //     value: JSON.stringify({event: 'User Profile Updated', updatedData})
+    //   }]
+    // })
+    //   }
 
     res.status(201).json(update);
     

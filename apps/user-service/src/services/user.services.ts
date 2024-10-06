@@ -6,6 +6,7 @@ import { UserRegister, UserUpdate } from '@repo/shared/types';
 dotenv.config();
 const jwtSecret = process.env.JWT_SECRET || 'default';
 
+//hash password
 
 export const createUser = async (data: UserRegister) => {
     try {
@@ -57,7 +58,11 @@ export const updateUser  = async (data: UserUpdate) => {
             user.password = password; 
         }
         const updatedUser = await user.save();
-        return updatedUser;
+        return {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        };
     } catch (error:any) {
         throw new Error(error.message);
     }

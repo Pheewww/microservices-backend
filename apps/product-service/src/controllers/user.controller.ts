@@ -12,18 +12,21 @@ export const createProduct = async (req: Request, res: Response) => {
       return;
     }
     const productCreatedEventData = {
-      productId: product._id,
+      productId: product.productId,
       name: product.name,
-      price: product.price
+      price: product.price,
+      stock: product.stock,
     }
+
+    console.log("data to kafka -> productCreatedEventData", productCreatedEventData);
     
     // Emit Product Created event to Kafka
-    await producer.send({
-      topic: 'product-service-events',
-      messages: [
-        { value: JSON.stringify({ event: 'Product Created', productCreatedEventData }) },
-      ],
-    });
+    // await producer.send({
+    //   topic: 'productevents',
+    //   messages: [
+    //     { value: JSON.stringify({ event: 'Product Created', productCreatedEventData }) },
+    //   ],
+    // });
 
     res.status(201).json(product);
   } catch (err: any) {
@@ -36,11 +39,11 @@ export const getProduct = async (req: Request, res:Response ): Promise<Response>
     //const product  = req.body;
     try {
 
-        const productId =  req.params.id; 
-
-        if (!productId) {
+        const { id } =  req.params; 
+        const productId = Number(id);
+        if (isNaN(productId)) {
           console.log("productId not exists");
-          return res.status(400).json({ error: "Product ID is required" });
+          return res.status(400).json({ error: "Invalid Product ID format." });
         }
 
         const product = await listProduct(productId);
@@ -65,8 +68,8 @@ export const getAllProduct = async (req: Request, res: Response) => {
     console.log("allProductList", allProductList);
     res.status(201).json(allProductList);
     
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
   }
 }
 
@@ -82,18 +85,29 @@ export const updateInventory = async (req: Request, res: Response) => {
 
         const result = await inventoryUpdate(updates);
 
-        await producer.send({
-          topic: 'product-service-events',
-          messages: [
-            {
-              value: JSON.stringify({event: 'Inventory Updated', updates})
-            }
-          ],
-        })
+        console.log("inventory update result", result);
+        console.log("kafka data for inventory update", updates);
+
+        if (!result) {
+          console.log("inventory update return nothing");
+          return;
+        }
+
+
+        // await producer.send({
+        //   topic: 'productevents',
+        //   messages: [
+        //     {
+        //       value: JSON.stringify({event: 'Inventory Updated', updates})
+        //     }
+        //   ],
+        // })
 
         return res.status(201).json(result);
-  } catch (error:any) {
-    throw new Error(error.message);
+  } catch (err:any) {
+    console.log("error in updateInventory ");
+
+      res.status(400).json({ error: err.message });
   }
 }
 

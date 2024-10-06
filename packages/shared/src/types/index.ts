@@ -17,13 +17,14 @@ export interface UserUpdate{
 }
 
 export interface Product {
-  id: string;
+  docId: number,
+  productId: number;
   name: string;
   price: number;
   stock: number;
 }
 
-export type InventoryUpdate = Partial<Pick<Product, 'id' | 'stock'>>;
+export type InventoryUpdate = Required<Pick<Product, 'id' | 'stock'>>;
 
 export interface Order {
   id: string;
@@ -35,5 +36,11 @@ export interface Order {
 export enum Role {
   ADMIN = 'admin',
   USER = 'user',
+}
+
+export enum Status {
+  PENDING = 'pending',
+  SHIPPED = 'shipped',
+  DELIVERED = 'delivered',
 }
 

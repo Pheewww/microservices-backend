@@ -1,33 +1,37 @@
 
 import { producer, createConsumer } from '@repo/shared/kafka'; 
 
-const userConsumer = createConsumer('user-service-group');
+const userConsumer = createConsumer('usergroup');
 const runKafkaConsumer = async () => {
+    try {
     await producer.connect();
     await userConsumer.connect();
 
-    await userConsumer.subscribe({ topics: ['order-service-events', 'product-service-events'], fromBeginning: true });
+    await userConsumer.subscribe({ topics: ['orderevents', 'productevents'], fromBeginning: true });
 
-    userConsumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
+     await userConsumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        if (!message.value) {
+          return;
+        }
 
-             if(!message.value){
-                return;
-            }
+        console.log({
+          topic,
+          partition,
+          offset: message.offset,
+          value: message.value.toString(),
+        });
 
-            console.log({
-                topic,
-                partition, 
-                offset: message.offset,
-                value: message.value.toString(),
-            })
-            
-            const event = JSON.parse(message.value.toString());
-            if (event.event === 'Order Placed') {
-                
-            }
-        },
+        const event = JSON.parse(message.value.toString());
+        if (event.event === 'Order Placed') {
+          // Handle Order Placed event
+        }
+      },
     });
+  } catch (error) {
+    console.error('Error in Kafka consumer:', error);
+    // Implement retry logic or graceful shutdown
+  }
 };
 
 export default runKafkaConsumer;

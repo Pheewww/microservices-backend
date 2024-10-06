@@ -1,7 +1,7 @@
  
 import { Schema, model, Document } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { Role } from '@repo/shared/types';
+import { Role } from '@repo/shared/types';  
 
 export interface IUser extends Document {
     name: string;
