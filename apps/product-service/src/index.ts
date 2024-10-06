@@ -8,7 +8,7 @@ connectUserDB();
 
 app.use(express.json());
 
-app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/product', productRoutes);
 
 
 const PORT = process.env.PORT || 3002;

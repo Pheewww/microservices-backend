@@ -1,17 +1,28 @@
 
-import { producer, consumer } from '@repo/shared/kafka'; 
-import { Message } from 'kafkajs';
+import { producer, createConsumer } from '@repo/shared/kafka'; 
 
+const userConsumer = createConsumer('user-service-group');
 const runKafkaConsumer = async () => {
     await producer.connect();
-    await consumer.connect();
+    await userConsumer.connect();
 
-    await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
-    await consumer.subscribe({ topic: 'product-events', fromBeginning: true });
+    await userConsumer.subscribe({ topics: ['order-service-events', 'product-service-events'], fromBeginning: true });
 
-    consumer.run({
-        eachMessage: async ({ topic, partition, message }: { topic: string; partition: number; message: Message }) => {
-            const event = JSON.parse(message.value?.toString() || '');
+    userConsumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+
+             if(!message.value){
+                return;
+            }
+
+            console.log({
+                topic,
+                partition, 
+                offset: message.offset,
+                value: message.value.toString(),
+            })
+            
+            const event = JSON.parse(message.value.toString());
             if (event.event === 'Order Placed') {
                 
             }

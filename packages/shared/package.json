@@ -6,7 +6,8 @@
     "./auth": "./src/middlewares/auth.middleware.ts",
     "./error":"./src/middlewares/error.middleware.ts",
     "./kafka": "./src/kafka.ts",
-    "./db": "./src/db.ts"
+    "./db": "./src/db.ts",
+    "./types": "./src/types/index.ts"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

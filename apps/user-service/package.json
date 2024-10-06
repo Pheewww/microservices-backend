@@ -5,7 +5,7 @@
   "scripts": {
   "build": "esbuild src/index.ts --platform=node --bundle --outdir=dist --external:bcrypt --external:mock-aws-s3 --external:aws-sdk --external:nock --external:@mapbox/node-pre-gyp && npm run copy-package",
   "copy-package": "node -e \"const fs = require('fs'); fs.copyFileSync('package.json', 'dist/package.json');\"",
-  "dev": "npm run build && nodemon dist/index.js"
+  "dev": "nodemon dist/index.js"
 },
   "keywords": [],
   "author": "",

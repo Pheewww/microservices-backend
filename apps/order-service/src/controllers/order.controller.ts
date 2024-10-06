@@ -2,15 +2,29 @@ import { Request, Response } from 'express';
 import { createOrder } from '../services/order.services.js';
 import { producer } from '@repo/shared/kafka';
 
+
+// EVENTS - Order place and Order Ship 
 export const placeOrder = async (req: Request, res: Response) => {
   try {
+
+     
     const order = await createOrder(req.body);
+    if (!order) {
+      return;
+    }
     
     // Emit Order Placed event to Kafka
+    const orderPlacedEventData = {
+      orderId: order.id,
+      user: order.userId,
+      quantity: order.quantity,
+      productId: order.productId 
+    }
+
     await producer.send({
-      topic: 'order-events',
+      topic: 'order-service-events',
       messages: [
-        { value: JSON.stringify({ event: 'Order Placed', orderId: order._id }) },
+        { value: JSON.stringify({ event: 'Order Placed', orderPlacedEventData }) },
       ],
     });
 

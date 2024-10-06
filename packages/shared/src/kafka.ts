@@ -6,6 +6,7 @@ const kafka1 = new Kafka({
 });
 
 export const producer = kafka1.producer();
-export const consumer = kafka1.consumer({
-    groupId:'groupName'
-}); 
+
+export const createConsumer = (groupId: string) => {
+    return kafka1.consumer({ groupId });
+};
