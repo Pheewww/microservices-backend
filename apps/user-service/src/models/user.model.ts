@@ -1,17 +1,16 @@
  
-import { Schema, model, Document } from 'mongoose';
-import * as bcrypt from 'bcrypt';
+import { Schema, model} from 'mongoose';
 import { Role } from '@repo/shared/types';  
 
-export interface IUser extends Document {
-    name: string;
-    email: string;
-    password: string;
-    role: Role,
-    comparePassword(password: string): Promise<boolean>;  
-}
+// export interface IUser extends Document {
+//     name: string;
+//     email: string;
+//     password: string;
+//     role: Role,
+//     comparePassword(password: string): Promise<boolean>;  
+// }
 
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -19,10 +18,10 @@ const userSchema = new Schema<IUser>({
 });
 
  
-userSchema.methods.comparePassword = async function (password: string): Promise<boolean> {
-    return await bcrypt.compare(password, this.password);
-};
+// userSchema.methods.comparePassword = async function (password: string): Promise<boolean> {
+//     return await bcrypt.compare(password, this.password);
+// };
 
-const User = model<IUser>('User', userSchema);
+const User = model('User', userSchema);
 
 export default User;

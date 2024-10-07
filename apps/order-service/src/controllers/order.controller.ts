@@ -47,7 +47,7 @@ export const allOrders = async (req: Request, res: Response) => {
     
     console.log("orderList", orderList);
 
-    return orderList;
+    return res.status(201).json(orderList);
     
   } catch (error:any) {
     res.status(400).json({ error: error.message });
@@ -68,7 +68,7 @@ export const orderDetail = async (req: Request, res: Response) => {
     const order = await findOrder(orderId);
     if (!order) {
       console.log("order not found");
-      res.status(404).json({ error: "Order Not found" });
+      return res.status(404).json({ error: "Order Not found" });
     }
 
     return res.status(200).json(order);
@@ -76,6 +76,6 @@ export const orderDetail = async (req: Request, res: Response) => {
   } catch (error:any) {
 
     res.status(400).json(error.message);
-    
+
   }
 }

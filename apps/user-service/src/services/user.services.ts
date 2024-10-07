@@ -1,5 +1,6 @@
-import User, { IUser } from '../models/user.model';
+import User from '../models/user.model';
 import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
 import dotenv from 'dotenv';
 import { UserRegister, UserUpdate } from '@repo/shared/types';
 
@@ -34,6 +35,7 @@ export const createUser = async (data: UserRegister) => {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
+        role,
         token
     }
         
@@ -43,13 +45,11 @@ export const createUser = async (data: UserRegister) => {
    
 };
 
-
-
 export const updateUser  = async (data: UserUpdate) => {
 
     try {
-        const { email, name, password } = data;
-        const user = await User.findOne({ email });
+        const { id, email, name, password } = data;
+        const user = await User.findById({ _id: id });
 
         if (!user) {
             throw new Error('User not found');
@@ -57,6 +57,11 @@ export const updateUser  = async (data: UserUpdate) => {
 
         if (name) {
             user.name = name;
+        }
+
+        if (email) {
+            user.email = email;
+            
         }
 
         if (password) {
@@ -74,4 +79,25 @@ export const updateUser  = async (data: UserUpdate) => {
 
 
 
-} 
+}
+
+export const findUser = async (userId: string) => {
+    try {
+
+        const user = await User.findById({ _id: new ObjectId(userId) });
+        return user;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+
+}
+
+export const getAllUsers = async (data: any) => {
+
+    try {
+        const users = await User.find();
+        return users;
+    } catch (error: any) {
+        throw new Error(error.message);
+    }
+}

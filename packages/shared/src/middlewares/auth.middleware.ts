@@ -2,14 +2,14 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
-const jwtSecret = process.env.JWT_SECRET || ' ';
+const jwtSecret = process.env.JWT_SECRET || 'default';
 
 export const verifyToken = (req:any, res:any, next:any) => {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(403).json({ message: 'Token is required' });
+    return res.status(403).json({ message: 'Token is required for this request' });
   }
 
   try {

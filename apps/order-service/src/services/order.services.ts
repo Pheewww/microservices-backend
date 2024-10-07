@@ -13,7 +13,7 @@ export const createOrder = async (data:any) => {
              throw new Error ("Order already exists");
         }
 
-        const userExists = await localUser.findOne({email: data.userId})
+        const userExists = await localUser.findOne({userId: data.userId})
         if (!userExists) {
              console.log("User not exist");
              throw new Error ("User Doesnt Exist");
@@ -135,7 +135,7 @@ try {
             return null;  
         }
 
-        const existingUser = await localUser.findOne({ email });
+        const existingUser = await localUser.findOne({ userId: id });
         if (existingUser) {
             console.log("User already exists:", existingUser);
             return existingUser;  
@@ -187,7 +187,7 @@ export const handleUserUpdateEvent =  async (data: User) => {
 export const getAllOrders = async (data:any) => {
 
     try {
-        const orders = await localUser.find();
+        const orders = await Order.find();
         return orders;
     } catch (error:any) {
         throw new Error(error.message);
@@ -197,7 +197,7 @@ export const getAllOrders = async (data:any) => {
 export const findOrder = async (orderId: number) => {
     try {
         
-        const order = await localUser.findOne({orderId});
+        const order = await Order.findOne({orderId});
         return order;
     } catch (error:any) {
         throw new Error(error.message);

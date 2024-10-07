@@ -4,6 +4,15 @@ export interface User {
   email: string;
 }
 
+// types.ts
+export interface UserG {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+
 export interface UserRegister{
   name: string;
   email: string;
@@ -12,6 +21,7 @@ export interface UserRegister{
 }
 
 export interface UserUpdate{
+  id: string,
   name?: string,
   email: string;
   password?: string;
