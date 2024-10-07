@@ -29,15 +29,14 @@ type Order {
     quantity: Int!
     createdAt: String!
   }
-    // createdAt is status, id is _id, orderId is not in order
 
 input OrderInput {
     orderId: Int!
-    userId: ID!
+    userId: String!
     productId: Int!
     quantity: Int!
-  }
-
+}
+    
 
 type Query {
     users: [User!]!
@@ -49,7 +48,7 @@ type Query {
 type Mutation {
     registerUser(name: String!, email: String!, password: String!, role: String): RegisterResponse!
     updateUserProfile(id: ID!, name: String, email: String,  password: String): UpdateUser!
-    placeOrder(input: OrderInput): Order!
+     placeOrder(input: OrderInput!): Order!
 }
 `;
 

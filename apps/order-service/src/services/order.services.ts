@@ -13,7 +13,10 @@ export const createOrder = async (data:any) => {
              throw new Error ("Order already exists");
         }
 
-        const userExists = await localUser.findOne({userId: data.userId})
+        const userId = data.userId;
+        console.log("userId", userId);
+        // const userExists = await localUser.findOne({userId: data.userId}) // will be changed for _id
+        const userExists = await localUser.findOne({ email: data.userId })
         if (!userExists) {
              console.log("User not exist");
              throw new Error ("User Doesnt Exist");

@@ -29,28 +29,22 @@ export const orderResolvers = {
   Mutation: {
     placeOrder: async (
       _: any,
-      {
-        orderId,
-        userId,
-        quantity,
-        productId,
-      }: {
-        orderId: number;
-        userId: string;
-        quantity: number;
-        productId: number;
-      }
+        { input }: { input: { orderId: number; userId: string; quantity: number; productId: number } }
     ) => {
       try {
-        const response = await axios.post(`${ORDER_SERVICE_URL}/`, {
-          orderId,
-          userId,
-          productId,
-          quantity,
-        });
+          const { orderId, userId, quantity, productId } = input;
+          const input1 = {
+              orderId,
+              userId,
+              productId,
+              quantity,
+          }
+          console.log("input", input);
+        const response = await axios.post(`${ORDER_SERVICE_URL}`, input1);
         return response.data;
       } catch (error: any) {
-        throw new Error("Failed to place order: " + error.message);
+          console.error('Error fetching order:', error.response ? error.response.data : error.message);
+          throw new Error('Failed to fetch order: ' + error.message);
       }
     },
   },
