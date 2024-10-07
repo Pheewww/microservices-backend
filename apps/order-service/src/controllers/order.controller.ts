@@ -23,12 +23,12 @@ export const placeOrder = async (req: Request, res: Response) => {
 
     console.log("kafka data -> orderPlacedEventData", orderPlacedEventData);
 
-    // await producer.send({
-    //   topic: 'orderevents',
-    //   messages: [
-    //     { value: JSON.stringify({ event: 'Order Placed', orderPlacedEventData }) },
-    //   ],
-    // });
+    await producer.send({
+      topic: 'orderevents',
+      messages: [
+        { value: JSON.stringify({ event: 'Order Placed', orderPlacedEventData }) },
+      ],
+    });
 
     res.status(201).json(order);
   } catch (err: any) {

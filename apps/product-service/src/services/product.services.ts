@@ -1,10 +1,24 @@
-import { InventoryUpdate, Order } from "@repo/shared/types";
+import { CreateProduct, InventoryUpdate, Order } from "@repo/shared/types";
 import {Product} from "../models/product.model";
 
-export const addProduct = async (data:any) => {
+export const addProduct = async (data: CreateProduct) => {
 
     try {
-    const newProduct = new Product(data);
+
+        // check if product exists already - id
+        
+        const productId = data.productId;
+        const productExists = await Product.findOne({productId});
+        if (productExists) {
+            throw new Error("Product exists already");
+        }
+
+    const newProduct = new Product({
+        productId,
+        name: data.name,
+        price: data.price,
+        stock: data.stock,
+    });
     await newProduct.save();
     return newProduct;
         
@@ -35,34 +49,47 @@ export const listAllProduct = async (data: any) => {
 }
 
 export const inventoryUpdate = async (data: InventoryUpdate[]) => {
+    const successfullyUpdated = [];
+    const notUpdated = [];
+
     try {
         for(const update of data){
             const {id, stock} = update;
 
-            if (!id) {
-                throw new Error ("Product ID is required for each update")
+            if (!id || !stock) {
+                const errorMessage = "Product ID AND Stock is required for each update";
+                notUpdated.push({ id, error: errorMessage });
+                console.error(errorMessage);
+                continue; 
             }
 
             const productId = id;
             const product = await Product.findOne({productId});
             if (!product) {
-                throw new Error (`Product Does not exist for ${id} id`);
+                const errorMessage = `Product does not exist for ID: ${id}, skipping this update.`;
+                notUpdated.push({ id, error: errorMessage });
+                console.error(errorMessage);
+                continue; 
             }
             
             if(typeof stock === 'number'){
 
                 const newStock = product.stock + stock;
                 if (newStock < 0) {
-                    throw new Error(`Error: Updating stock for product ID ${id}, would result in negative quantity. Other products have been updated`);
+                    const errorMessage = `Error: Updating stock for product ID ${id} would result in negative quantity. Skipping this update.`;
+                    notUpdated.push({ id, error: errorMessage });
+                     console.error(`Error: Updating stock for product ID ${id} would result in negative quantity. Skipping this update.`);
+                    continue; 
                 }
                 product.stock = newStock;
+                successfullyUpdated.push({id: productId, stock})
             }
             console.log("updated product", product);
 
             await product.save();
         }
 
-        return { message: 'Inventory updated successfully.' };
+        return { result: {message: 'Inventory updated successfully.'}, successfullyUpdated, notUpdated };
     } catch (error:any) {
         console.log("error in inventory block");
         throw new Error(error.message);
@@ -94,7 +121,7 @@ export const handleOrderPlacedEvent = async (data: Order) => {
         }
 
         const updatedProduct = await Product.updateOne(
-        { _id: data.productId },
+        { productId: data.productId },
         { $set: { stock: productQuantityUpdate } }
         );
 

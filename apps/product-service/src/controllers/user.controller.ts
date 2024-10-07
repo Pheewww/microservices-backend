@@ -20,13 +20,13 @@ export const createProduct = async (req: Request, res: Response) => {
 
     console.log("data to kafka -> productCreatedEventData", productCreatedEventData);
     
-    // Emit Product Created event to Kafka
-    // await producer.send({
-    //   topic: 'productevents',
-    //   messages: [
-    //     { value: JSON.stringify({ event: 'Product Created', productCreatedEventData }) },
-    //   ],
-    // });
+    //Emit Product Created event to Kafka
+    await producer.send({
+      topic: 'productevents',
+      messages: [
+        { value: JSON.stringify({ event: 'Product Created', productCreatedEventData }) },
+      ],
+    });
 
     res.status(201).json(product);
   } catch (err: any) {
@@ -83,27 +83,32 @@ export const updateInventory = async (req: Request, res: Response) => {
             throw new Error(message);
         }
 
-        const result = await inventoryUpdate(updates);
-
-        console.log("inventory update result", result);
-        console.log("kafka data for inventory update", updates);
+        const { result, successfullyUpdated, notUpdated} = await inventoryUpdate(updates);
 
         if (!result) {
           console.log("inventory update return nothing");
-          return;
+          return res.status(204).send(); 
         }
 
+        console.log("inventory update result", result);
+        console.log("kafka data for inventory update", successfullyUpdated);
 
-        // await producer.send({
-        //   topic: 'productevents',
-        //   messages: [
-        //     {
-        //       value: JSON.stringify({event: 'Inventory Updated', updates})
-        //     }
-        //   ],
-        // })
+        if (successfullyUpdated.length > 0) {
+        await producer.send({
+          topic: 'productevents',
+          messages: [
+            {
+              value: JSON.stringify({event: 'Inventory Updated', successfullyUpdated})
+            }
+          ],
+        })
+      }
 
-        return res.status(201).json(result);
+        return res.status(201).json({
+          result,
+          successfullyUpdated,
+          notUpdated
+        });
   } catch (err:any) {
     console.log("error in updateInventory ");
 

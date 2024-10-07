@@ -9,10 +9,11 @@ const runKafkaConsumer = async () => {
 
   await orderConsumer.subscribe({ topics: ['productevents', 'userevents'], fromBeginning: true });
   
+  
   await orderConsumer.run({
     
         eachMessage: async ({topic, partition, message }) => {
-
+            try {
             if(!message.value){
                 return;
             }
@@ -35,7 +36,8 @@ const runKafkaConsumer = async () => {
                 return;
                 
                } catch (error:any) {
-                throw new Error(error.message);
+                    console.error(`Error processing 'Product Created': ${error.message}`);
+                    await sendToDLQ(message);
                } 
             }
 
@@ -44,11 +46,12 @@ const runKafkaConsumer = async () => {
                 // list of product id and their stocks
                 // map over all product id, create transaction?
                 try {
-                    const update = await handleInventoryUpdateEvent(event.updates)
+                    const update = await handleInventoryUpdateEvent(event.successfullyUpdated)
                     console.log("inventory update", update);
                     return;
                 } catch (error:any) {
-                    throw new Error(error.message);
+                     console.error(`Error processing 'Inventory Updated': ${error.message}`);
+                    await sendToDLQ(message);
                 }
             }
 
@@ -61,27 +64,51 @@ const runKafkaConsumer = async () => {
                     return;
                     
                 } catch (error:any) {
-                    throw new Error(error.message);
+                        console.error(`Error processing 'User Registered': ${error.message}`);
+                        await sendToDLQ(message);
                 }
                  
             }
 
             if (event.event === 'User Profile Updated') {
-                try {
-                    const update = await handleUserUpdateEvent(event.updatedData);
-                    console.log("user new data", update);
-                    return;
-                } catch (error:any) {
-                    throw new Error(error.message);
+                    try {
+                        const update = await handleUserUpdateEvent(event.updatedData);
+                        console.log("user new data", update);
+                        return;
+                    } catch (error:any) {
+                        console.error(`Error processing 'User Profile Updated': ${error.message}`);
+                        await sendToDLQ(message);
+                    }
+                }
+            }catch (outerError: any) {
+                    console.error(`Error in processing message: ${outerError.message}`);
+                    await sendToDLQ(message);
                 }
             }
-        },
     });
   } catch (error) {
     console.error('Error in Kafka consumer:', error);
-    // Implement retry logic or graceful shutdown
   }
 }
+
+const DLQTOPIC = 'OrderDLQ';
+const sendToDLQ = async (message: any) => {
+    try {
+        await producer.send({
+            topic: DLQTOPIC,
+            messages: [
+                {
+                    key: message.key,  
+                    value: message.value,  
+                    headers: message.headers  
+                }
+            ]
+        });
+        console.log(`Message sent to DLQ: ${message.value.toString()}`);
+    } catch (dlqError:any) {
+        console.error('Failed to send message to DLQ:', dlqError.message);
+    }
+};
 
 
 export default runKafkaConsumer;

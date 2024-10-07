@@ -14,4 +14,4 @@ const PORT  =  3001;
 
 app.listen(PORT, () => console.log(`User service is runnning on PORT ${PORT}`));
 
-// runKafkaConsumer().catch(console.error);
+runKafkaConsumer().catch(console.error);

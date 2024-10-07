@@ -12,13 +12,18 @@ export const createUser = async (data: UserRegister) => {
     try {
 
         const role = data.role && data.role === 'admin' ? 'admin' : 'user';
+        //check if user exists already
+        // email verify?
+
         const newUser = new User({
             name: data.name,
             email: data.email,
             password: data.password,
             role: role
         });
+        
         await newUser.save();
+
          const token =  jwt.sign(
         { id: newUser._id, role: newUser.role },
         jwtSecret,

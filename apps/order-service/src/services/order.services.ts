@@ -34,6 +34,9 @@ export const createOrder = async (data:any) => {
         if (reqQuantity > stockAvailaible) {
             throw new Error("not enough quantitty");
         }
+        if (reqQuantity <=0) {
+            throw new Error("quantity can be 1 or more");
+        }
 
         const newOrder  = new Order({
             orderId,
@@ -89,11 +92,11 @@ export const handleInventoryUpdateEvent = async (data: InventoryUpdate[]) => {
         for(const update of data){
             const {id, stock} = update;
 
-            if (!id) {
-                throw new Error ("Product ID is required for each update")
+            if (!id  || !stock) {
+                throw new Error ("Product ID AND Stock is required for each update")
             }
 
-            const product = await localProduct.findById(id);
+            const product = await localProduct.findOne({productId: id});
             // if (!product) {
             //     console.error(`non-existent product ID: ${id}`);
             //     throw new Error(`Product does not exist for ID ${id}`);

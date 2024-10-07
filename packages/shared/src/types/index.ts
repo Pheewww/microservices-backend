@@ -32,6 +32,13 @@ export interface Order {
   quantity: number;
 }
 
+export interface CreateProduct {
+  productId: Number,
+  name: String,
+  price: Number,
+  stock: Number,
+}
+
 
 export enum Role {
   ADMIN = 'admin',
@@ -43,4 +50,6 @@ export enum Status {
   SHIPPED = 'shipped',
   DELIVERED = 'delivered',
 }
+
+
 

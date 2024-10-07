@@ -15,4 +15,4 @@ const PORT = process.env.PORT || 3002;
 
 app.listen(PORT, () => console.log(`Product service is running on PORT ${PORT}`))
 
-// runKafkaConsumer().catch(console.error);
+runKafkaConsumer().catch(console.error);

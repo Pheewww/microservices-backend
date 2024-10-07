@@ -15,4 +15,4 @@ const PORT = 3003;
 
 app.listen(PORT, () => console.log(`Order Service is running on ${PORT}`));
 
-//runKafkaConsumer().catch(console.error);
+runKafkaConsumer().catch(console.error);
