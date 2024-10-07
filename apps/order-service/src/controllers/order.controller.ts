@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createOrder } from '../services/order.services.js';
+import { createOrder, findOrder, getAllOrders } from '../services/order.services.js';
 import { producer } from '@repo/shared/kafka';
 
 
@@ -35,3 +35,47 @@ export const placeOrder = async (req: Request, res: Response) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+
+export const allOrders = async (req: Request, res: Response) => {
+  try {
+
+    const orderList = await getAllOrders(req.body);
+    if (!orderList) {
+      res.status(400).json({ error: "orders can;t be retrieved"});
+    }
+    
+    console.log("orderList", orderList);
+
+    return orderList;
+    
+  } catch (error:any) {
+    res.status(400).json({ error: error.message });
+    
+  }
+}
+
+export const orderDetail = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const orderId = Number(id);
+    if (isNaN(orderId)) {
+      console.log("Order Doesn;t Exist");
+      return res.status(400).json({error: "Order Id Has To Be Number"});
+    }
+
+    const order = await findOrder(orderId);
+    if (!order) {
+      console.log("order not found");
+      res.status(404).json({ error: "Order Not found" });
+    }
+
+    return res.status(200).json(order);
+
+  } catch (error:any) {
+
+    res.status(400).json(error.message);
+    
+  }
+}

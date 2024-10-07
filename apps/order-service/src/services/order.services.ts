@@ -129,7 +129,7 @@ export const handleInventoryUpdateEvent = async (data: InventoryUpdate[]) => {
 
 export const handleUserRegisteredEvent = async (data: User) => {
 try {
-     const { email, name } = data;  
+     const { id, email, name } = data;  
         if (!email) {
             console.log("No email provided in user registration event");
             return null;  
@@ -142,6 +142,7 @@ try {
         }
 
         const newUser = new localUser({
+            userId: id, 
             name,     
             email,    
         });
@@ -182,3 +183,23 @@ export const handleUserUpdateEvent =  async (data: User) => {
         throw new Error(error.message);  
     }
 };
+
+export const getAllOrders = async (data:any) => {
+
+    try {
+        const orders = await localUser.find();
+        return orders;
+    } catch (error:any) {
+        throw new Error(error.message);
+    }
+}
+
+export const findOrder = async (orderId: number) => {
+    try {
+        
+        const order = await localUser.findOne({orderId});
+        return order;
+    } catch (error:any) {
+        throw new Error(error.message);
+    }
+}
