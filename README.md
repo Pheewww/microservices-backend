@@ -70,8 +70,9 @@ This command will build the Docker images and start all the services.
 
 To run the application in development mode:
 
-1. Start the services: `npm run dev`
-2. To run a specific service: `cd directory` then `npm run dev`
+1. In root dir, `npm install` then `npm run build` to build all services.
+2. Then start the services: `npm run dev`
+3. To run a specific service: `cd <service-directory>` then `npm run build` then `npm run dev`
 
 Replace `<service-name>` with graphql-gateway, user-service, product-service, or order-service.
 
