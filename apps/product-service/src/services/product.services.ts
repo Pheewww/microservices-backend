@@ -1,5 +1,6 @@
 import { CreateProduct, InventoryUpdate, Order } from "@repo/shared/types";
 import {Product} from "../models/product.model";
+import { ObjectId } from 'mongodb';
 
 export const addProduct = async (data: CreateProduct) => {
 
@@ -28,17 +29,17 @@ export const addProduct = async (data: CreateProduct) => {
     
 }
 
-export const listProduct = async (productId: number) => {
+export const listProduct = async (docId: string) => {
     
     try {
-        const product  = await Product.findOne({productId});
+        const product = await Product.findById({ _id: new ObjectId(docId) });
         return product;
     } catch (error:any) {
         throw new Error(error.message);
     }
 } 
 
-export const listAllProduct = async (data: any) => {
+export const listAllProduct = async () => {
     
     try {
         const products = await Product.find();

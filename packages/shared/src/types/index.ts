@@ -28,7 +28,7 @@ export interface UserUpdate{
 }
 
 export interface Product {
-  docId: number,
+  id: string,
   productId: number;
   name: string;
   price: number;
@@ -60,6 +60,7 @@ export enum Status {
   PENDING = 'pending',
   SHIPPED = 'shipped',
   DELIVERED = 'delivered',
+  CANCELLED = 'cancelled',
 }
 
 

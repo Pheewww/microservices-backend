@@ -1,5 +1,5 @@
 import Router from 'express'
-import { createProduct, getProduct, getAllProduct, updateInventory} from '../controllers/user.controller'
+import { createProduct, getProduct, getAllProduct, updateInventory} from '../controllers/product.controller'
 import {verifyToken} from '@repo/shared/auth';
 
 const router = Router();

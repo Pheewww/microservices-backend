@@ -48,6 +48,7 @@ export const updateUserProfile  = async (req: Request, res: Response) => {
     }
 
     const updatedData = {
+      id: update.id,
       name: update.name,
       email: update.email,
     }
@@ -82,7 +83,7 @@ export const allUsers = async (req:Request, res:Response) => {
 
     console.log("userList", userList);
 
-    return userList;
+    return res.status(200).json(userList);
 
   } catch (error: any) {
     res.status(400).json({ error: error.message });
@@ -108,9 +109,10 @@ export const getUser = async (req: Request, res: Response) => {
 
     if (!user) {
       console.log("User not found");
-      res.status(404).json({ error: "User Not found" });
+      return res.status(404).json({ error: "User Not found" });
     }
 
+    console.log("all users", user);
     return res.status(200).json(user);
 
   } catch (error: any) {

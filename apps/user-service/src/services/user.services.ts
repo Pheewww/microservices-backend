@@ -25,10 +25,12 @@ export const createUser = async (data: UserRegister) => {
         
         await newUser.save();
 
+        console.log("jwt secret", jwtSecret);
+
          const token =  jwt.sign(
         { id: newUser._id, role: newUser.role },
         jwtSecret,
-        { expiresIn: '24h' }
+        { expiresIn: '7d' }
     );
 
     return {

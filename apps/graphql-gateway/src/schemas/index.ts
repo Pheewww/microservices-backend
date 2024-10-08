@@ -8,6 +8,13 @@ const typeDefs = gql`
     role: String!
 }
 
+input UserInput {
+  name: String!
+  email: String! 
+  password: String!
+  role: String
+}
+
  type UpdateUser {
     id: ID!
     name: String!
@@ -24,30 +31,51 @@ type RegisterResponse {
 
 type Order {
     id: ID!
-    userId: String!
-    productId: Int!
-    quantity: Int!
-    createdAt: String!
-  }
-
-input OrderInput {
     orderId: Int!
     userId: String!
     productId: Int!
     quantity: Int!
+    createdAt: String!
+    status: String!
+  }
+
+input OrderInput {
+    orderId: Int!
+    userId: ID!
+    productId: Int!
+    quantity: Int!
 }
+
+type Product {
+    id: ID!
+    productId: Int!
+    name: String!
+    price: Int!
+    stock: Int!
+    createdAt: String!
+  }
+
+input ProductInput {
+    productId: Int!
+    name: String!
+    price: Int!
+    stock: Int
+  }
     
 
 type Query {
     users: [User!]!
     user(id: ID!): User
+    products: [Product!]! 
+    product(id: ID!): Product  
     orders: [Order!]!
-    order(orderId: Int!): Order
+    order(id: ID!): Order
 }
 
 type Mutation {
-    registerUser(name: String!, email: String!, password: String!, role: String): RegisterResponse!
+    registerUser(input: UserInput!): RegisterResponse!
     updateUserProfile(id: ID!, name: String, email: String,  password: String): UpdateUser!
+     createProduct(input: ProductInput!): Product!
      placeOrder(input: OrderInput!): Order!
 }
 `;

@@ -2,6 +2,7 @@ import {Order}  from '../models/order.model';
 import {localProduct}  from '../models/product.model';
 import {localUser}  from '../models/user.model';
 import {InventoryUpdate, Product, User} from '@repo/shared/types'
+import { ObjectId } from 'mongodb';
 
 export const createOrder = async (data:any) => {
     try {
@@ -16,7 +17,7 @@ export const createOrder = async (data:any) => {
         const userId = data.userId;
         console.log("userId", userId);
         // const userExists = await localUser.findOne({userId: data.userId}) // will be changed for _id
-        const userExists = await localUser.findOne({ email: data.userId })
+        const userExists = await localUser.findOne({ userId: data.userId })
         if (!userExists) {
              console.log("User not exist");
              throw new Error ("User Doesnt Exist");
@@ -71,6 +72,7 @@ export const handleProductCreatedEvent = async (data: Product) => {
 
         // not in local, add
         const newProduct = new localProduct({
+            id: data.id,
             productId,
             name: data.name,
             price: data.price,
@@ -161,22 +163,22 @@ try {
 
 export const handleUserUpdateEvent =  async (data: User) => {
      try {
-        const { email, name } = data;  
-        
-        if (!email) {
-            throw new Error("Email is required for updating user data.");
-        }
+         const { id, email, name } = data;
+         const existingUser = await localUser.findOne({ userId: id });
 
-        const existingUser = await localUser.findOne({ email });
-        if (!existingUser) {
-            console.log("User not found for email:", email);
-            return null; 
-        }
+         if (!existingUser) {
+             throw new Error('User not found');
+             return;
+         }
 
-        if (name) {
-            existingUser.name = name;  
-        }
+         if (existingUser) {
+             existingUser.name = name;
+         }
 
+         if (email) {
+             existingUser.email = email;
+
+         }
         const updatedUser = await existingUser.save();
         console.log('User profile updated:', updatedUser);
 
@@ -187,7 +189,7 @@ export const handleUserUpdateEvent =  async (data: User) => {
     }
 };
 
-export const getAllOrders = async (data:any) => {
+export const getAllOrders = async () => {
 
     try {
         const orders = await Order.find();
@@ -197,10 +199,10 @@ export const getAllOrders = async (data:any) => {
     }
 }
 
-export const findOrder = async (orderId: number) => {
+export const findOrder = async (orderId: string) => {
     try {
         
-        const order = await Order.findOne({orderId});
+        const order = await Order.findById({ _id: new ObjectId(orderId) });
         return order;
     } catch (error:any) {
         throw new Error(error.message);

@@ -13,6 +13,7 @@ export const verifyToken = (req:any, res:any, next:any) => {
   }
 
   try {
+    console.log("jwt secret in verifyToken", jwtSecret);
     const decoded = jwt.verify(token, jwtSecret);
     req.user = decoded;  
 

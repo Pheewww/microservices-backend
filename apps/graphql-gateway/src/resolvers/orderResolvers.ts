@@ -13,9 +13,9 @@ export const orderResolvers = {
           throw new Error('Failed to fetch orders: ' + error.message);
       }
     },
-    order: async (_: any, { orderId }: { orderId: number }) => {
+    order: async (_: any, { id }: { id: string }) => {
       try {
-          const response = await axios.get(`${ORDER_SERVICE_URL}/${orderId}`);
+          const response = await axios.get(`${ORDER_SERVICE_URL}/${id}`);
         if (!response.data) {
           throw new Error("Order not found");
         }
@@ -39,7 +39,7 @@ export const orderResolvers = {
               productId,
               quantity,
           }
-          console.log("input", input);
+          console.log("input1", input1);
         const response = await axios.post(`${ORDER_SERVICE_URL}`, input1);
         return response.data;
       } catch (error: any) {

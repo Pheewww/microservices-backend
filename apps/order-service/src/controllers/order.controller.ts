@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { createOrder, findOrder, getAllOrders } from '../services/order.services.js';
 import { producer } from '@repo/shared/kafka';
+import { ObjectId } from 'mongodb';
 
 
 // EVENTS - Order place and Order Ship 
@@ -15,7 +16,8 @@ export const placeOrder = async (req: Request, res: Response) => {
     
     // Emit Order Placed event to Kafka
     const orderPlacedEventData = {
-      orderId: order.id,
+      id: order._id,
+      orderId: order.orderId,
       user: order.userId,
       quantity: order.quantity,
       productId: order.productId 
@@ -30,9 +32,9 @@ export const placeOrder = async (req: Request, res: Response) => {
       ],
     });
 
-    res.status(201).json(order);
+    return res.status(201).json(order);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 };
 
@@ -40,9 +42,9 @@ export const placeOrder = async (req: Request, res: Response) => {
 export const allOrders = async (req: Request, res: Response) => {
   try {
 
-    const orderList = await getAllOrders(req.body);
+    const orderList = await getAllOrders();
     if (!orderList) {
-      res.status(400).json({ error: "orders can;t be retrieved"});
+      return res.status(400).json({ error: "orders can;t be retrieved"});
     }
     
     console.log("orderList", orderList);
@@ -50,7 +52,7 @@ export const allOrders = async (req: Request, res: Response) => {
     return res.status(201).json(orderList);
     
   } catch (error:any) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
     
   }
 }
@@ -59,13 +61,18 @@ export const orderDetail = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const orderId = Number(id);
-    if (isNaN(orderId)) {
-      console.log("Order Doesn;t Exist");
-      return res.status(400).json({error: "Order Id Has To Be Number"});
+    if (!id) {
+      console.log("Order ID is needed");
+      return res.status(400).json({ error: "Order ID doesnt exist" });
+
     }
 
-    const order = await findOrder(orderId);
+    if (!ObjectId.isValid(id)) {
+      console.log("Order Doesn;t Exist");
+      return res.status(400).json({ error: "Order Id Has To Be Valid Doc Id" });
+    }
+
+    const order = await findOrder(id);
     if (!order) {
       console.log("order not found");
       return res.status(404).json({ error: "Order Not found" });
@@ -75,7 +82,7 @@ export const orderDetail = async (req: Request, res: Response) => {
 
   } catch (error:any) {
 
-    res.status(400).json(error.message);
+    return res.status(400).json(error.message);
 
   }
 }

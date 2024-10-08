@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { addProduct, listProduct, listAllProduct, inventoryUpdate } from '../services/product.services';
 import { producer } from '@repo/shared/kafka';
+import { ObjectId } from 'mongodb';
 
 
 // EVENTS - Product Created and Inventory Updated() 
@@ -12,6 +13,7 @@ export const createProduct = async (req: Request, res: Response) => {
       return;
     }
     const productCreatedEventData = {
+      id: product._id,
       productId: product.productId,
       name: product.name,
       price: product.price,
@@ -28,9 +30,9 @@ export const createProduct = async (req: Request, res: Response) => {
       ],
     });
 
-    res.status(201).json(product);
+    return res.status(201).json(product);
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 };
 
@@ -40,15 +42,21 @@ export const getProduct = async (req: Request, res:Response ): Promise<Response>
     try {
 
         const { id } =  req.params; 
-        const productId = Number(id);
-        if (isNaN(productId)) {
-          console.log("productId not exists");
-          return res.status(400).json({ error: "Invalid Product ID format." });
-        }
+      if (!id) {
+        console.log("Product ID is needed");
+        return res.status(400).json({ error: "Product ID doesnt exist" });
 
-        const product = await listProduct(productId);
+      }
+
+      if (!ObjectId.isValid(id)) {
+        console.log("Prodcuct Doesn;t Exist");
+        return res.status(400).json({ error: "Product Id Has To Be Valid Doc Id" });
+      }
+
+        const product = await listProduct(id);
 
          if (!product) {
+           console.log("Product not found");
             return res.status(404).json({ error: "Product not found" });
          }
 
@@ -64,12 +72,12 @@ export const getProduct = async (req: Request, res:Response ): Promise<Response>
 export const getAllProduct = async (req: Request, res: Response) => {
 
   try {
-    const allProductList = await listAllProduct(req.body);
+    const allProductList = await listAllProduct();
     console.log("allProductList", allProductList);
-    res.status(201).json(allProductList);
+    return res.status(201).json(allProductList);
     
   } catch (err: any) {
-    res.status(400).json({ error: err.message });
+    return res.status(400).json({ error: err.message });
   }
 }
 
@@ -112,7 +120,7 @@ export const updateInventory = async (req: Request, res: Response) => {
   } catch (err:any) {
     console.log("error in updateInventory ");
 
-      res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
   }
 }
 

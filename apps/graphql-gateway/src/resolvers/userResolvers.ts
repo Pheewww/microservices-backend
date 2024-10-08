@@ -10,7 +10,8 @@ export const userResolvers = {
         const response = await axios.get(`${USER_SERVICE_URL}`);
         return response.data;
       } catch (error: any) {
-        throw new Error("Failed to fetch users" + error.message);
+        console.error('Error fetching users:', error.response ? error.response.data : error.message);
+        throw new Error('Failed to fetch users: ' + error.message);
       }
     },
     user: async (_: any, { id }: { id: string }) => {
@@ -23,38 +24,31 @@ export const userResolvers = {
         
         const user = response.data;
 
-        // return {
-        //   id: user._id,
-        //   name: user.name,
-        //   email: user.email,
-        //   role: user.role
-        // };
+        if (!user) {
+          console.log("user is null", user);
+        }
+
+        console.log('Fetched user:', user);
+
+
         return user;
       } catch (error: any) {
-        throw new Error("Failed to fetch user: " + error.message);
+        console.error('Error fetching users:', error.response ? error.response.data : error.message);
+        throw new Error('Failed to fetch users: ' + error.message);
       }
     },
   },
   Mutation: {
     registerUser: async (
       _: any,
-      {
-        name,
-        email,
-        password,
-        role,
-      }: { name: string; email: string; password: string; role?: string }
+      { input }: { input: { name: string; email: string; password: string; role?: string } }
     ) => {
       try {
-        const response = await axios.post(`${USER_SERVICE_URL}/register`, {
-          name,
-          email,
-          password,
-          role,
-        });
+        const response = await axios.post(`${USER_SERVICE_URL}/register`, input);
         return response.data;
       } catch (error: any) {
-        throw new Error("Failed to register user: " + error.message);
+        console.error('Error fetching users:', error.response ? error.response.data : error.message);
+        throw new Error('Failed to fetch users: ' + error.message);
       }
     },
     updateUserProfile: async (
@@ -75,7 +69,8 @@ export const userResolvers = {
         });
         return response.data;
       } catch (error: any) {
-        throw new Error("Failed to update user profile: " + error.message);
+        console.error('Error fetching users:', error.response ? error.response.data : error.message);
+        throw new Error('Failed to fetch users: ' + error.message);
       }
     },
   },
