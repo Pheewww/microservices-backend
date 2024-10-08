@@ -100,7 +100,7 @@ export const updateOrder  = async (req: Request, res:Response) => {
 
     
     if (!Object.values(Status).includes(newStatus as Status) || newStatus === Status.PENDING) {
-      return res.status(400).json({ message: 'Invalid status. Cannot set status to pending.' });
+      return res.status(400).json({ message: 'Either Invalid status or Cannot set status to pending.' });
     }
 
     const order = await Order.findOne({ orderId: orderId });

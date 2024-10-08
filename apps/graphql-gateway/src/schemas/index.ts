@@ -2,7 +2,6 @@ import { gql } from 'apollo-server';
 
 const typeDefs = gql`
  type User {
-    id: ID!
     name: String!
     email: String!
     role: String!
@@ -30,7 +29,6 @@ type RegisterResponse {
 }
 
 type Order {
-    id: ID!
     orderId: Int!
     userId: String!
     productId: Int!
@@ -47,7 +45,6 @@ input OrderInput {
 }
 
 type Product {
-    id: ID!
     productId: Int!
     name: String!
     price: Int!

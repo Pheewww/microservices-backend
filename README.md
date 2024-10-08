@@ -1,81 +1,260 @@
-# Turborepo starter
+# Microservices-Based Platform
 
-This is an official starter Turborepo.
+This project is a microservices-based e-commerce platform using Node.js, TypeScript, GraphQL, MongoDB, and Kafka.
 
-## Using this example
+## Table of Contents
 
-Run the following command:
+1. [Prerequisites](#prerequisites)
+2. [Project Structure](#project-structure)
+3. [Installation](#installation)
+4. [Configuration](#configuration)
+5. [Running the Application](#running-the-application)
+6. [Development](#development)
+7. [API Documentation](#api-documentation)
+8. [Troubleshooting](#troubleshooting)
 
-```sh
-npx create-turbo@latest
+## Prerequisites
+
+Ensure you have the following installed on your system:
+
+- Node.js (v18 or later)
+- Docker and Docker Compose
+- Git
+
+## Project Structure
+```
+├── apps
+│   ├── graphql-gateway
+│   ├── order-service
+│   ├── product-service
+│   └── user-service
+├── packages
+│   ├── eslint-config
+│   ├── shared
+│   ├── typescript-config
+│   └── ui
+├── docker-compose.yml
+├── package.json
+└── README.md
 ```
 
-## What's inside?
+## Installation
 
-This Turborepo includes the following packages/apps:
+1. Clone the repository:
+ ```bash
+   git clone https://github.com/Pheewww/microservices-backend
+   cd microservices-backend
+   ```
 
-### Apps and Packages
+## Configuration
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+1. Set up environment variables:
+- Copy the `.env.example` file in each service directory to `.env`
+- Update the `.env` files with your specific configuration
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+2. Update Graphql configuration:
+- change graphql service env as per your designed ports for each service
 
-### Utilities
+## Running the Application
 
-This Turborepo has some additional tools already setup for you:
+1. Start the application using Docker: `docker-compose up --build`.
+This command will build the Docker images and start all the services.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+2. The ( Default ) services will be available at:
+- GraphQL Gateway: http://localhost:4000
+- User Service: http://localhost:3001
+- Product Service: http://localhost:3002
+- Order Service: http://localhost:3003
 
-### Build
+## Development
 
-To build all apps and packages, run the following command:
+To run the application in development mode:
+
+1. Start the services: `npm run dev`
+2. To run a specific service: `cd directory` then `npm run dev`
+
+Replace `<service-name>` with graphql-gateway, user-service, product-service, or order-service.
+
+## Postman Collection Apis
+use `backendApis.postman_collection.json` file 
+
+## Graphql Playground Queries and Mutations
+
+Create User
+```
+mutation RegisterUser {
+    registerUser(
+        input: {
+            name: "john doww"
+            email: "email@gmail.com"
+            password: "secure11"
+            role: "admin"
+        }
+    ) {
+        name
+        email
+        role
+        token //copy it if user is admin
+        id
+    }
+} 
+```
+
+Get User by ID
+```query Users {
+    user(id: "670504d3ff2ee3e8e456ccb4") {
+        name
+        email
+        role
+    }
+}
+```
+
+Get All Users
+```
+query Users {
+    users {
+        name
+        email
+        role
+    }
+}
+```
+
+Update User Profile
+```
+mutation UpdateUserProfile {
+    updateUserProfile(
+        id: "6705261cd87d7e3cd63b1c10"
+        name: "john doeee"
+        email: "nextemail@gmail.com"
+    ) {
+        id
+        name
+        email
+    }
+}
+```
+Get All Products
+```
+query Product {
+    products {
+        productId
+        name
+        price
+        stock
+        createdAt
+    }
+}
+```
+
+Get Product by ID
+```
+query Product {
+    product(id: "6705111ae8b42dfc570afe15") {
+        productId
+        name
+        price
+        stock
+        createdAt
+    }
+}
+```
+
+Create Product (ADMIN ONLY, needs token)
+```
+// Send Copied Token as Auth Header
+
+mutation PlaceOrder {
+    createProduct(
+        input: { productId: 122222, name: "asdas", price: 100, stock: 1000 }
+    ) {
+        productId
+        name
+        price
+        stock
+        createdAt
+    }
+}
+```
+Place an Order
+```
+mutation PlaceOrder {
+    placeOrder(
+        input: {
+            orderId: 1222
+            userId: "6705261cd87d7e3cd63b1c10"
+            productId: 123
+            quantity: 10
+        }
+    ) {
+        orderId
+        userId
+        productId
+        quantity
+        createdAt
+        status
+    }
+}
 
 ```
-cd my-turborepo
-pnpm build
+
+Place an Order 
+```
+mutation PlaceOrder2 {
+    placeOrder(input: { orderId: 444, userId: "userId", productId: 123, quantity: 10 }) {
+        orderId
+        userId
+        productId
+        quantity
+        createdAt
+        status
+    }
+}
 ```
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
+Get All Orders
 ```
-cd my-turborepo
-pnpm dev
-```
-
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
+query Orders {
+    orders {
+        orderId
+        userId
+        productId
+        quantity
+        createdAt
+        status
+    }
+}
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
+Get Order by ID
 ```
-npx turbo link
+query Order {
+    order(id: "67052a245e1cf09a57aab44a") {
+        orderId
+        userId
+        productId
+        quantity
+        createdAt
+        status
+    }
+}
+```
+```
+support for update product and update order is not at present, they are in postman apis at present
 ```
 
-## Useful Links
 
-Learn more about the power of Turborepo:
 
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+
+## API Documentation
+
+- GraphQL API: Access the GraphQL Playground at http://localhost:4000/graphql when the application is running.
+
+## Troubleshooting
+
+1. If you encounter connection issues with MongoDB Atlas, ensure your IP address is whitelisted in the Atlas dashboard.
+
+2. For Kafka connection issues, check if the Kafka service is running and the broker addresses are correct in your service configurations.
+
+3. If a service fails to start, check the Docker logs:
